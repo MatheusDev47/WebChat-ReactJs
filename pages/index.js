@@ -9,7 +9,6 @@ function GlobalStyle () {
             padding: 0;
             box-sizing: border-box;
             list-style: none;
-                margin-bottom: 5px;
         }
 
         body {
