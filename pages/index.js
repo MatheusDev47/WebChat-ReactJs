@@ -1,37 +1,7 @@
 import { Box, Button, Text, TextField, Image } from '@skynexui/components'
+import React from 'react'
+import {useRouter} from 'next/router'
 import appConfig from '../config.json'
-
-function GlobalStyle () {
-    return (
-        <style global="true" sjx>{`
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            list-style: none;
-        }
-
-        body {
-            font-family: 'Open Sans', sans-serif;
-        }
-
-        /* App fit Height */ 
-            html, body, #__next {
-            min-height: 100vh;
-            display: flex;
-            flex: 1;
-        }
-
-        #__next {
-            flex: 1;
-        }
-
-        #__next > * {
-            flex: 1;
-        }
-        `}</style>
-    )
-}
 
 function TitleReact (props) {
     const Tag = props.tag || 'h1'
@@ -91,10 +61,22 @@ function DescriptionTxt (props) {
 }
 
 export default function HomePage () {
-    const username = 'MatheusDev47'
+    //const username = 'MatheusDev47'
+    const [username, setUsername] = React.useState('')
+    const root = useRouter() 
+    const url = `https://api.github.com/users/${username}`
+    
+        fetch(url)
+        .then(response =>{
+            return response.json()
+        })
+        .then(response =>{
+            console.log(response)
+            const dataName = document.getElementById('nameGitHub')
+            dataName.innerHTML = response.name
+        })
     return (
         <>
-            <GlobalStyle />
             <Box 
                 styleSheet={{
                      display: 'flex', alignItems: 'center', justifyContent: {md: 'center'},
@@ -118,6 +100,11 @@ export default function HomePage () {
                     {/*Formulário*/}
                     <Box
                         as="form"
+                        onSubmit={eventInfo =>{
+                            eventInfo.preventDefault()
+                            root.push('/chat')
+                            //window.location.href = '/chat'
+                        }}
                         styleSheet={{
                             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', order: '2',
                             width: { xs: '100%', sm: '50%' }, textAlign: 'center', marginBottom: '32px',
@@ -130,7 +117,31 @@ export default function HomePage () {
                         
                         <DescriptionTxt tag="p">Toda mensagem tem uma reação</DescriptionTxt>
 
+                        {/*<input 
+                            type="text" 
+                            value={username}
+                            onChange={function (event){
+                                console.log(event.target.value)
+                                //Valor
+                                const value = event.target.value
+                                //trocar o valor da variável
+                                //atráves do react e avise quem precisa
+                                setUsername(value)
+                            }}
+                        />*/}
+
                         <TextField
+                        value={username}
+                        onChange={function (event) {
+                            const valueInput = event.target.value
+                            setUsername(valueInput)
+                            const boxImg = document.getElementById('imgBox')
+                            if (valueInput.length <= 2) {
+                                boxImg.setAttribute('style', 'display: none')
+                            }else {
+                                boxImg.setAttribute('style', 'display: flex')
+                            }
+                        }}
                         fullWidth
                         textFieldColors={{
                             neutral: {
@@ -141,6 +152,7 @@ export default function HomePage () {
                             },
                         }}
                         />
+                        
                         <Button
                         styleSheet={{
                             marginTop: '5px'
@@ -159,9 +171,10 @@ export default function HomePage () {
                     {/* Formulário */}
 
                     {/* Photo Area */}
-                    <Box
+                    <Box 
+                        id = "imgBox"
+                        style={{display: 'none'}}
                         styleSheet={{
-                            display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
                             maxWidth: '200px',
@@ -181,6 +194,19 @@ export default function HomePage () {
                         }}
                         src={`https://github.com/${username}.png`}
                         />
+                        <Text 
+                        id="nameGitHub" 
+                        styleSheet={{
+                            fontSize: '18px',
+                            color: appConfig.theme.colors.neutrals[200],
+                            backgroundColor: appConfig.theme.colors.neutrals[900],
+                            marginBottom: '5px',
+                            padding: '3px 10px',
+                            borderRadius: '1000px'
+                        }}
+                        >
+                        </Text>
+
                         <Text
                         variant="body4"
                         styleSheet={{
@@ -192,11 +218,12 @@ export default function HomePage () {
                         >
                         {username}
                         </Text>
+                        
                     </Box> 
                     {/* Photo Area */}
                 </Box>
 
-                <Image styleSheet={{width: {lg: '50%'}, display: {xl: 'block', xs: 'none'}}} src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png" />
+                <Image styleSheet={{width: '40%', display: {xl: 'block', xs: 'none'}}} src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png" />
 
             </Box>
         </>
