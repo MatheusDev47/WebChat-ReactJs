@@ -66,15 +66,16 @@ export default function HomePage () {
     const root = useRouter() 
     const url = `https://api.github.com/users/${username}`
     
+    React.useEffect(() =>{
         fetch(url)
-        .then(response =>{
-            return response.json()
-        })
-        .then(response =>{
-            console.log(response)
+        .then(async (response) =>{
+            const responseServer = await response.json()
             const dataName = document.getElementById('nameGitHub')
-            dataName.innerHTML = response.name
+            dataName.innerHTML = responseServer.name
         })
+    }, [username])
+    
+
     return (
         <>
             <Box 
@@ -102,8 +103,16 @@ export default function HomePage () {
                         as="form"
                         onSubmit={eventInfo =>{
                             eventInfo.preventDefault()
-                            root.push('/chat')
-                            //window.location.href = '/chat'
+                            const messageError = document.getElementById('messageError')
+                            if (username === '' || username.length <= 2) {
+                                root.push('')
+                                messageError.innerHTML = 'O campo precisa ser preenchido ou ter mais que dois caracteres'
+                            }else{
+                                messageError.innerHTML = ''
+                                root.push(`/chat?username=${username}`)
+                                //window.location.href = '/chat'
+                            }
+                            
                         }}
                         styleSheet={{
                             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', order: '2',
@@ -131,14 +140,17 @@ export default function HomePage () {
                         />*/}
 
                         <TextField
+                        id="test"
                         value={username}
                         onChange={function (event) {
+                            const messageError = document.getElementById('messageError')
                             const valueInput = event.target.value
                             setUsername(valueInput)
                             const boxImg = document.getElementById('imgBox')
                             if (valueInput.length <= 2) {
                                 boxImg.setAttribute('style', 'display: none')
                             }else {
+                                messageError.innerHTML = ''
                                 boxImg.setAttribute('style', 'display: flex')
                             }
                         }}
@@ -152,6 +164,7 @@ export default function HomePage () {
                             },
                         }}
                         />
+                        <Text styleSheet={{color: 'red'}} id="messageError"></Text>
                         
                         <Button
                         styleSheet={{
